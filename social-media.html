@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Accounts - PostData Dashboard</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-logo">PostData</div>
+        <ul class="sidebar-menu">
+            <li><a href="index.html"><span class="icon">📊</span> Dashboard</a></li>
+            <li><a href="analytics.html"><span class="icon">📈</span> Analytics</a></li>
+            <li><a href="social-accounts.html" class="active"><span class="icon">👥</span> Social Accounts</a></li>
+            <li><a href="social-media.html"><span class="icon">📅</span> Social Media</a></li>
+            <li><a href="settings.html"><span class="icon">⚙️</span> Settings</a></li>
+        </ul>
+    </aside>
+    <main class="main-content">
+        <nav class="navbar">
+            <button class="navbar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('active')">☰</button>
+            <div class="navbar-title">Social Accounts</div>
+        </nav>
+        <div class="header-container">
+            <nav class="breadcrumb">
+                <a href="index.html">Dashboard</a>
+                <span class="separator">/</span>
+                <span>Social Accounts</span>
+            </nav>
+            <button id="addAccountBtn" class="add-account-btn">
+                <i class="fas fa-plus"></i> Add Account
+            </button>
+        </div>
+        <div class="dashboard">
+            <div class="card full-width">
+                <h2>Social Accounts</h2>
+                <div class="table-container">
+                    <table id="socialAccountsTable">
+                        <thead>
+                            <tr>
+                                <th>Account ID</th>
+                                <th>Platform</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Table content will be dynamically added here -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div id="addAccountModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Add New Account</h2>
+            <form id="addAccountForm">
+                <div class="form-group">
+                    <label for="accountId">Account ID:</label>
+                    <input type="text" id="accountId" name="accountId" required>
+                </div>
+                <div class="form-group">
+                    <label for="accountPassword">Password:</label>
+                    <input type="password" id="accountPassword" name="accountPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="accountPlatform">Platform:</label>
+                    <select id="accountPlatform" name="accountPlatform" required>
+                        <option value="">Select a platform</option>
+                        <option value="facebook">Facebook</option>
+                        <option value="instagram">Instagram</option>
+                        <option value="twitter">Twitter</option>
+                    </select>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="submit-btn">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="scripts.js"></script>
+</body>
+</html>
+

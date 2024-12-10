@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Accounts - PostData Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        .breadcrumb {
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .breadcrumb a {
+            color: var(--primary-color);
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .action-buttons {
+            margin-bottom: 20px;
+        }
+
+        .create-link {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: var(--primary-color);
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+
+        .create-link:hover {
+            background-color: #3a7bc8;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 500px;
+            border-radius: 8px;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+
+        .form-actions {
+            text-align: right;
+            margin-top: 20px;
+        }
+
+        .save-btn, .cancel-btn, .add-url-btn, .remove-url-btn {
+            padding: 8px 16px;
+            margin-left: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .save-btn {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .cancel-btn {
+            background-color: #ccc;
+            color: #333;
+        }
+
+        .add-url-btn {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        .remove-url-btn {
+            background-color: #f44336;
+            color: white;
+        }
+
+        .post-url-container {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .post-url-container input {
+            flex-grow: 1;
+            margin-right: 10px;
+        }
+
+        .nested-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .nested-table td {
+            border: none;
+            padding: 4px 12px;
+        }
+
+        .user-row {
+            background-color: #f0f0f0;
+        }
+
+        .user-row td {
+            font-weight: bold;
+        }
+
+        .post-row td:first-child {
+            padding-left: 24px;
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-logo">PostData</div>
+        <ul class="sidebar-menu">
+            <li><a href="index.html"><span class="icon">📊</span> Dashboard</a></li>
+            <li><a href="#"><span class="icon">📈</span> Analytics</a></li>
+            <li><a href="social-accounts.html" class="active"><span class="icon">👥</span> Social Accounts</a></li>
+            <li><a href="social-media.html"><span class="icon">📅</span>Social Media</a></li>
+            <li><a href="settings.html"><span class="icon">⚙️</span> Settings</a></li>
+        </ul>
+    </aside>
+    <main class="main-content">
+        <nav class="breadcrumb">
+            <a href="index.html">Dashboard</a> &gt;
+            <span>Social Accounts</span>
+        </nav>
+        <nav class="navbar">
+            <button class="navbar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('active')">☰</button>
+            <div class="navbar-title">Social Accounts</div>
+        </nav>
+        <div class="dashboard">
+            <div class="card full-width">
+                <h2>PostData Table</h2>
+                <div class="action-buttons">
+                    <a href="#" id="createNewBtn" class="create-link">Create New</a>
+                </div>
+                <div class="filters">
+                    <input type="date" id="fromDate" placeholder="From Date">
+                    <input type="date" id="toDate" placeholder="To Date">
+                    <input type="text" id="profileURL" placeholder="Profile URL">
+                    <input type="text" id="postURL" placeholder="Post URL">
+                    <button id="filterBtn">Filter</button>
+                </div>
+                <div class="table-container">
+                    <table id="postDataTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable(1)">Profile URL ID ▼</th>
+                                <th onclick="sortTable(1)">Post URL ▼</th>
+                                <th onclick="sortTable(2)">Post Date Time ▼</th>
+                                <th onclick="sortTable(3)">Post Found Date Time ▼</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="user-row">
+                                <td colspan="4">user123</td>
+                            </tr>
+                            <tr class="post-row">
+                                <td></td>
+                                <td>https://example.com/user123/post1</td>
+                                <td>2023-01-15 10:30:00</td>
+                                <td>2023-01-15 11:00:00</td>
+                            </tr>
+                            <tr class="post-row">
+                                <td></td>
+                                <td>https://example.com/user123/post2</td>
+                                <td>2023-01-16 14:45:00</td>
+                                <td>2023-01-16 15:15:00</td>
+                            </tr>
+                            <tr class="post-row">
+                                <td></td>
+                                <td>https://example.com/user123/post3</td>
+                                <td>2023-01-17 09:00:00</td>
+                                <td>2023-01-17 09:30:00</td>
+                            </tr>
+                            <tr class="user-row">
+                                <td colspan="4">user456</td>
+                            </tr>
+                            <tr class="post-row">
+                                <td></td>
+                                <td>https://example.com/user456/post1</td>
+                                <td>2023-02-01 11:20:00</td>
+                                <td>2023-02-01 11:50:00</td>
+                            </tr>
+                            <tr class="post-row">
+                                <td></td>
+                                <td>https://example.com/user456/post2</td>
+                                <td>2023-02-02 16:00:00</td>
+                                <td>2023-02-02 16:30:00</td>
+                            </tr>
+                            <tr class="post-row">
+                                <td></td>
+                                <td>https://example.com/user456/post3</td>
+                                <td>2023-02-03 13:15:00</td>
+                                <td>2023-02-03 13:45:00</td>
+                            </tr>
+                            <tr class="user-row">
+                                <td colspan="4">user789</td>
+                            </tr>
+                            <tr class="post-row">
+                                <td></td>
+                                <td>https://example.com/user789/post1</td>
+                                <td>2023-03-10 08:30:00</td>
+                                <td>2023-03-10 09:00:00</td>
+                            </tr>
+                            <tr class="post-row">
+                                <td></td>
+                                <td>https://example.com/user789/post2</td>
+                                <td>2023-03-11 12:45:00</td>
+                                <td>2023-03-11 13:15:00</td>
+                            </tr>
+                            <tr class="post-row">
+                                <td></td>
+                                <td>https://example.com/user789/post3</td>
+                                <td>2023-03-12 17:00:00</td>
+                                <td>2023-03-12 17:30:00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+    <div id="createModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Create New Post</h2>
+            <form id="createForm">
+                <div class="form-group">
+                    <label for="srNo">Sr No:</label>
+                    <input type="number" id="srNo" name="srNo" required>
+                </div>
+                <div class="form-group">
+                    <label for="profileUrlId">Profile URL ID:</label>
+                    <input type="text" id="profileUrlId" name="profileUrlId" required>
+                </div>
+                <div class="form-group">
+                    <label>Post URLs:</label>
+                    <div id="postUrlsContainer">
+                        <div class="post-url-container">
+                            <input type="url" name="postUrls[]" required>
+                            <button type="button" class="remove-url-btn">Remove</button>
+                        </div>
+                    </div>
+                    <button type="button" id="addUrlBtn" class="add-url-btn">Add URL</button>
+                </div>
+                <div class="form-group">
+                    <label for="postDateTime">Post Date Time:</label>
+                    <input type="datetime-local" id="postDateTime" name="postDateTime" required>
+                </div>
+                <div class="form-group">
+                    <label for="postFoundDateTime">Post Found Date Time:</label>
+                    <input type="datetime-local" id="postFoundDateTime" name="postFoundDateTime" required>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="save-btn">Save</button>
+                    <button type="button" class="cancel-btn">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <script src="script.js"></script>
+    <script>
+        // Get the modal
+        var modal = document.getElementById("createModal");
+
+        // Get the button that opens the modal
+        var btn = document.getElementById("createNewBtn");
+
+        // Get the <span> element that closes the modal
+        var span = document.getElementsByClassName("close")[0];
+
+        // When the user clicks the button, open the modal 
+        btn.onclick = function() {
+          modal.style.display = "block";
+        }
+
+        // When the user clicks on <span> (x), close the modal
+        span.onclick = function() {
+          modal.style.display = "none";
+        }
+
+        // When the user clicks anywhere outside of the modal, close it
+        window.onclick = function(event) {
+          if (event.target == modal) {
+            modal.style.display = "none";
+          }
+        }
+
+        // Get the form and add submit event listener
+        var form = document.getElementById("createForm");
+        form.onsubmit = function(event) {
+          event.preventDefault();
+          // Here you would typically send the form data to a server
+          // For now, we'll just close the modal
+          modal.style.display = "none";
+        }
+
+        // Get the cancel button and add click event listener
+        var cancelBtn = document.querySelector(".cancel-btn");
+        cancelBtn.onclick = function() {
+          modal.style.display = "none";
+        }
+
+        // Function to add new post URL input
+        function addPostUrlInput() {
+            var container = document.getElementById("postUrlsContainer");
+            var newInput = document.createElement("div");
+            newInput.className = "post-url-container";
+            newInput.innerHTML = `
+                <input type="url" name="postUrls[]" required>
+                <button type="button" class="remove-url-btn">Remove</button>
+            `;
+            container.appendChild(newInput);
+        }
+
+        // Function to remove post URL input
+        function removePostUrlInput(button) {
+            var container = document.getElementById("postUrlsContainer");
+            if (container.children.length > 1) {
+                button.parentElement.remove();
+            }
+        }
+
+        // Add event listener for adding new post URL input
+        document.getElementById("addUrlBtn").addEventListener("click", addPostUrlInput);
+
+        // Add event listener for removing post URL input
+        document.getElementById("postUrlsContainer").addEventListener("click", function(e) {
+            if (e.target && e.target.className == "remove-url-btn") {
+                removePostUrlInput(e.target);
+            }
+        });
+    </script>
+</body>
+</html>
+

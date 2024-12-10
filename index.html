@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enhanced PostData Dashboard</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #50e3c2;
+            --background-color: #f5f7fa;
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --border-color: #e1e4e8;
+            --sidebar-width: 250px;
+            --navbar-height: 60px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--primary-color);
+            color: white;
+            padding: 20px;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            transition: transform 0.3s ease;
+        }
+
+        .sidebar-logo {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .sidebar-menu {
+            list-style-type: none;
+        }
+
+        .sidebar-menu li {
+            margin-bottom: 15px;
+        }
+
+        .sidebar-menu a {
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+        }
+
+        .sidebar-menu a:hover {
+            opacity: 0.8;
+        }
+
+        .sidebar-menu .icon {
+            margin-right: 10px;
+            font-size: 20px;
+        }
+
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            padding-top: calc(var(--navbar-height) + 20px);
+        }
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            height: var(--navbar-height);
+            background-color: white;
+            display: flex;
+            align-items: center;
+            padding: 0 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar-toggle {
+            display: none;
+            font-size: 24px;
+            background: none;
+            border: none;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        .navbar-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--primary-color);
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .card.full-width {
+            grid-column: 1 / -1;
+        }
+
+        h1, h2 {
+            margin-bottom: 20px;
+            color: var(--primary-color);
+        }
+
+        .filters {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        @media (min-width: 640px) {
+            .filters {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (min-width: 1024px) {
+            .filters {
+                grid-template-columns: repeat(5, 1fr);
+            }
+        }
+
+        input, button {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #3a7bc8;
+        }
+
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+            cursor: pointer;
+        }
+
+        th:hover {
+            background-color: #3a7bc8;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8f9fa;
+        }
+
+        .chart-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            height: 300px;
+        }
+
+        .pie-chart, .donut-chart {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+        }
+
+        .donut-chart::before {
+            content: "";
+            display: block;
+            width: 100px;
+            height: 100px;
+            background-color: var(--card-background);
+            border-radius: 50%;
+            position: relative;
+            top: 50px;
+            left: 50px;
+        }
+
+        .chart-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 0 10px 10px 0;
+        }
+
+        .legend-color {
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            border-radius: 50%;
+        }
+
+        .bar-chart {
+            display: flex;
+            align-items: flex-end;
+            height: 200px;
+            padding-top: 20px;
+        }
+
+        .bar {
+            flex: 1;
+            margin: 0 2px;
+            background-color: var(--primary-color);
+            transition: height 0.3s ease;
+        }
+
+        .bar-label {
+            text-align: center;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .navbar {
+                left: 0;
+            }
+
+            .navbar-toggle {
+                display: block;
+            }
+        }
+        .pie-chart {
+            background: conic-gradient(
+                var(--primary-color) 0deg 90deg,
+                var(--secondary-color) 90deg 180deg,
+                #ff9800 180deg 270deg,
+                #f44336 270deg 360deg
+            );
+        }
+        .donut-chart {
+            background: conic-gradient(
+                #4CAF50 0deg 144deg,      /* 40% - Visit Done (Green) */
+                #2196F3 144deg 216deg,    /* 20% - Error (Blue) */
+                #FFC107 216deg 306deg,    /* 25% - Pending (Yellow) */
+                #f44336 306deg 360deg     /* 15% - No Post (Red) */
+            );
+        }
+    </style>
+</head>
+<body>
+    <aside class="sidebar">
+        <div class="sidebar-logo">PostData</div>
+        <ul class="sidebar-menu">
+            <li><a href="#"><span class="icon">📊</span> Dashboard</a></li>
+            <li><a href="analytics"><span class="icon">📈</span> Analytics</a></li>
+            <li><a href="social-accounts.html"><span class="icon">👥</span> Social Accounts</a></li>
+            <li><a href="social-media.html"><span class="icon">📅</span>Social Media</a></li>
+            <li><a href="#"><span class="icon">⚙️</span> Settings</a></li>
+        </ul>
+    </aside>
+    <main class="main-content">
+        <nav class="navbar">
+            <button class="navbar-toggle" onclick="document.querySelector('.sidebar').classList.toggle('active')">☰</button>
+            <div class="navbar-title">PostData Dashboard</div>
+        </nav>
+        <div class="dashboard">
+            <div class="card full-width">
+                <h2>PostData Table</h2>
+                <div class="filters">
+                    <input type="date" id="fromDate" placeholder="From Date">
+                    <input type="date" id="toDate" placeholder="To Date">
+                    <input type="text" id="profileURL" placeholder="Profile URL">
+                    <input type="text" id="postURL" placeholder="Post URL">
+                    <button id="filterBtn">Filter</button>
+                </div>
+                <div class="table-container">
+                    <table id="postDataTable">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable(0)">Profile URL ID ▼</th>
+                                <th onclick="sortTable(1)">Post URL ▼</th>
+                                <th onclick="sortTable(2)">Post Date Time ▼</th>
+                                <th onclick="sortTable(3)">Post Found Date Time ▼</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td rowspan="3">user123</td>
+                                <td>https://example.com/user123/post1</td>
+                                <td>2023-01-15 10:30:00</td>
+                                <td>2023-01-15 11:00:00</td>
+                            </tr>
+                            <tr>
+                                <td>https://example.com/user123/post2</td>
+                                <td>2023-01-16 14:45:00</td>
+                                <td>2023-01-16 15:15:00</td>
+                            </tr>
+                            <tr>
+                                <td>https://example.com/user123/post3</td>
+                                <td>2023-01-17 09:00:00</td>
+                                <td>2023-01-17 09:30:00</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="3">user456</td>
+                                <td>https://example.com/user456/post1</td>
+                                <td>2023-02-01 11:20:00</td>
+                                <td>2023-02-01 11:50:00</td>
+                            </tr>
+                            <tr>
+                                <td>https://example.com/user456/post2</td>
+                                <td>2023-02-02 16:00:00</td>
+                                <td>2023-02-02 16:30:00</td>
+                            </tr>
+                            <tr>
+                                <td>https://example.com/user456/post3</td>
+                                <td>2023-02-03 13:15:00</td>
+                                <td>2023-02-03 13:45:00</td>
+                            </tr>
+                            <tr>
+                                <td rowspan="3">user789</td>
+                                <td>https://example.com/user789/post1</td>
+                                <td>2023-03-10 08:30:00</td>
+                                <td>2023-03-10 09:00:00</td>
+                            </tr>
+                            <tr>
+                                <td>https://example.com/user789/post2</td>
+                                <td>2023-03-11 12:45:00</td>
+                                <td>2023-03-11 13:15:00</td>
+                            </tr>
+                            <tr>
+                                <td>https://example.com/user789/post3</td>
+                                <td>2023-03-12 17:00:00</td>
+                                <td>2023-03-12 17:30:00</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Post Distribution by Category</h2>
+                <div class="chart-container">
+                    <div class="pie-chart"></div>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--primary-color);"></div>
+                        <span>Category A (25%)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: var(--secondary-color);"></div>
+                        <span>Category B (25%)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #ff9800;"></div>
+                        <span>Category C (25%)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #f44336;"></div>
+                        <span>Category D (25%)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h2>User Engagement - Visiting Time</h2>
+                <div class="chart-container">
+                    <div class="donut-chart"></div>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #4CAF50;"></div>
+                        <span>Visit Done (40%)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #2196F3;"></div>
+                        <span>Error (20%)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #FFC107;"></div>
+                        <span>Pending (25%)</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-color" style="background-color: #f44336;"></div>
+                        <span>No Post (15%)</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h2>Monthly Post Distribution</h2>
+                <div class="bar-chart">
+                    <div class="bar" style="height: 60%;">
+                        <div class="bar-label">Jan</div>
+                    </div>
+                    <div class="bar" style="height: 80%;">
+                        <div class="bar-label">Feb</div>
+                    </div>
+                    <div class="bar" style="height: 40%;">
+                        <div class="bar-label">Mar</div>
+                    </div>
+                    <div class="bar" style="height: 90%;">
+                        <div class="bar-label">Apr</div>
+                    </div>
+                    <div class="bar" style="height: 70%;">
+                        <div class="bar-label">May</div>
+                    </div>
+                    <div class="bar" style="height: 50%;">
+                        <div class="bar-label">Jun</div>
+                    </div>
+                    <div class="bar" style="height: 75%;">
+                        <div class="bar-label">Jul</div>
+                    </div>
+                    <div class="bar" style="height: 85%;">
+                        <div class="bar-label">Aug</div>
+                    </div>
+                    <div class="bar" style="height: 65%;">
+                        <div class="bar-label">Sep</div>
+                    </div>
+                    <div class="bar" style="height: 55%;">
+                        <div class="bar-label">Oct</div>
+                    </div>
+                    <div class="bar" style="height: 45%;">
+                        <div class="bar-label">Nov</div>
+                    </div>
+                    <div class="bar" style="height: 95%;">
+                        <div class="bar-label">Dec</div>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <h2>Yearly Report</h2>
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Year</th>
+                                <th>Total Posts</th>
+                                <th>Growth Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>2021</td>
+                                <td>1,234</td>
+                                <td>-</td>
+                            </tr>
+                            <tr>
+                                <td>2022</td>
+                                <td>2,345</td>
+                                <td>+90%</td>
+                            </tr>
+                            <tr>
+                                <td>2023</td>
+                                <td>3,456</td>
+                                <td>+47%</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </main>
+    <script>
+        function sortTable(n) {
+            var table, rows, switching, i, x, y, shouldSwitch, dir, switchcount = 0;
+            table = document.getElementById("postDataTable");
+            switching = true;
+            dir = "asc";
+            while (switching) {
+                switching = false;
+                rows = table.rows;
+                for (i = 1; i < (rows.length - 1); i++) {
+                    shouldSwitch = false;
+                    x = rows[i].getElementsByTagName("TD")[n];
+                    y = rows[i + 1].getElementsByTagName("TD")[n];
+                    if (dir == "asc") {
+                        if (x.innerHTML.toLowerCase() > y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    } else if (dir == "desc") {
+                        if (x.innerHTML.toLowerCase() < y.innerHTML.toLowerCase()) {
+                            shouldSwitch = true;
+                            break;
+                        }
+                    }
+                }
+                if (shouldSwitch) {
+                    rows[i].parentNode.insertBefore(rows[i + 1], rows[i]);
+                    switching = true;
+                    switchcount++;
+                } else {
+                    if (switchcount == 0 && dir == "asc") {
+                        dir = "desc";
+                        switching = true;
+                    }
+                }
+            }
+            // Update sorting indicators
+            var headers = table.getElementsByTagName("TH");
+            for (i = 0; i < headers.length; i++) {
+                headers[i].innerHTML = headers[i].innerHTML.replace(" ▼", "").replace(" ▲", "");
+            }
+            headers[n].innerHTML += (dir == "asc") ? " ▲" : " ▼";
+        }
+    </script>
+</body>
+</html>
+
